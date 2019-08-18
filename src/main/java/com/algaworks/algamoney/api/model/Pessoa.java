@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 public class Pessoa {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long Id;
 
     @NotNull
