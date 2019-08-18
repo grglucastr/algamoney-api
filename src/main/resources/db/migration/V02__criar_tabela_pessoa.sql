@@ -9,8 +9,7 @@ CREATE TABLE pessoa (
     cep VARCHAR(12),
     cidade VARCHAR(80),
     estado VARCHAR(80)
-)
-ENGINE=InnoDB CHARSET=utf8
+)ENGINE=InnoDB CHARSET=utf8;
 
 INSERT INTO pessoa (nome, ativo, logradouro, numero, complemento, bairro, cep, cidade, estado) VALUES
 ('George Lucas Bentes Nunes', 1, 'Rua Professor Lázaro Gonçalves', '402', 'BL-B, 2a Etapa', 'Japiim', '69077-747', 'Manaus', 'AM'),
