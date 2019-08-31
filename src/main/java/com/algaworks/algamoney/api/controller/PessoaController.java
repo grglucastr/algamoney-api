@@ -44,5 +44,11 @@ public class PessoaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pessoa);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void remover(@PathVariable Long id){
+        pessoaRepository.deleteById(id);
+    }
+
 
 }
