@@ -1,4 +1,4 @@
-CREATE TABLE lancamento(
+CREATE TABLE lancamento (
     codigo BIGINT(20) PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(50) NOT NULL,
     data_vencimento DATE NOT NULL,
@@ -8,6 +8,6 @@ CREATE TABLE lancamento(
     tipo VARCHAR(20) NOT NULL,
     codigo_categoria BIGINT(20) NOT NULL,
     codigo_pessoa BIGINT(20) NOT NULL,
-    FOREIGN KEY (codigo_categoria) REFERENCES categoria(codigo_categoria),
+    FOREIGN KEY (codigo_categoria) REFERENCES categoria(codigo),
     FOREIGN KEY (codigo_pessoa) REFERENCES pessoa(id)
-)Engine=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
