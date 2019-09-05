@@ -1,17 +1,26 @@
 package com.algaworks.algamoney.api.controller;
 
 import com.algaworks.algamoney.api.event.RecursoCriadoEvent;
+import com.algaworks.algamoney.api.exceptionhandler.AlgamoneyExceptionHandler;
 import com.algaworks.algamoney.api.model.Lancamento;
 import com.algaworks.algamoney.api.repository.LancamentoRepository;
+import com.algaworks.algamoney.api.service.LancamentoService;
+import com.algaworks.algamoney.api.service.exception.PessoaInexistenteOuInativaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
+
+import com.algaworks.algamoney.api.exceptionhandler.AlgamoneyExceptionHandler.Erro;
+
 
 @RestController
 @RequestMapping("/lancamentos")
@@ -21,7 +30,14 @@ public class LancamentoController  {
     private LancamentoRepository lancamentoRepository;
 
     @Autowired
+    private LancamentoService lancamentoService;
+
+
+    @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     public List<Lancamento> listar(){
@@ -35,18 +51,29 @@ public class LancamentoController  {
                 .findById(codigo)
                 .map(lancamento -> ResponseEntity.ok(lancamento))
                 .orElse(ResponseEntity.notFound().build());
-
-
     }
 
     @PostMapping
     public ResponseEntity<Lancamento> salvar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response){
 
-        Lancamento lanc = lancamentoRepository.save(lancamento);
+        Lancamento lanc = lancamentoService.salvar(lancamento);
         publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamento.getCodigo()));
         return ResponseEntity.status(HttpStatus.CREATED).body(lanc);
+    }
+
+    @ExceptionHandler({PessoaInexistenteOuInativaException.class })
+    public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex){
+
+        String mensagemUsuario = messageSource.getMessage("pessoa.inexistente-ou-inativa", null,
+                LocaleContextHolder.getLocale());
+        String mensagemDev = ex.toString();
+
+        List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDev));
+        return ResponseEntity.badRequest().body(erros);
 
     }
+
+
 
 
 }
