@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.algaworks.algamoney.api.exceptionhandler.AlgamoneyExceptionHandler.Erro;
 
@@ -62,6 +64,19 @@ public class LancamentoController  {
         Lancamento lanc = lancamentoService.salvar(lancamento);
         publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamento.getCodigo()));
         return ResponseEntity.status(HttpStatus.CREATED).body(lanc);
+    }
+
+
+    @DeleteMapping("/{codigo}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirLancamento(@PathVariable Long codigo){
+
+        Optional<Lancamento> lancamento = lancamentoRepository.findById(codigo);
+        if(lancamento.isEmpty()){
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        lancamentoRepository.deleteById(codigo);
     }
 
     @ExceptionHandler({PessoaInexistenteOuInativaException.class })
