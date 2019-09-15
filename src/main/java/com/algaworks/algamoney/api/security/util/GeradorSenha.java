@@ -6,7 +6,7 @@ public class GeradorSenha {
 
     public static void main(String[] args){
         BCryptPasswordEncoder enc = new BCryptPasswordEncoder();
-        System.out.println(enc.encode("angular"));
+        System.out.println(enc.encode("mobile"));
     }
 
 
