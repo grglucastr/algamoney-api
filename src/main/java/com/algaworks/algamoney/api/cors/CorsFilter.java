@@ -18,7 +18,7 @@ public class CorsFilter implements Filter {
     @Autowired
     private AlgamoneyApiProperty algamoneyApiProperty;
 
-    private String originPermitida = algamoneyApiProperty.getOriginPermitida();
+    private String originPermitida;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -26,6 +26,8 @@ public class CorsFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
+
+        originPermitida = algamoneyApiProperty.getOriginPermitida();
 
         resp.setHeader("Access-Control-Allow-Origin", originPermitida);
         resp.setHeader("Access-Control-Allow-Credentials", "true");
