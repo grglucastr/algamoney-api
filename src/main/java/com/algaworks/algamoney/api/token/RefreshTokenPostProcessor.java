@@ -1,5 +1,7 @@
 package com.algaworks.algamoney.api.token;
 
+import com.algaworks.algamoney.api.config.property.AlgamoneyApiProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -19,6 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 @ControllerAdvice
 public class RefreshTokenPostProcessor implements
         ResponseBodyAdvice<OAuth2AccessToken> { // Poderia ser <Categoria> se estivessemos interceptando categoria
+
+    @Autowired
+    private AlgamoneyApiProperty algamoneyApiProperty;
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -55,7 +60,7 @@ public class RefreshTokenPostProcessor implements
     public void enfiarRefreshTokenNoCookie(HttpServletRequest req, HttpServletResponse resp, String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false); //TODO: mudar para true em producao
+        refreshTokenCookie.setSecure(algamoneyApiProperty.getSecuranca().isEnableHttps());
 
         // Pra onde o cookie vai ser enviado
         refreshTokenCookie.setPath(req.getContextPath() + "/oath/token");
