@@ -29,12 +29,12 @@ public class PessoaService {
     }
 
     private Pessoa buscarPessoaPeloId(Long id) {
-        Optional<Pessoa> pessoaSalva = pessoaRepository.findById(id);
+        Pessoa pessoaSalva = pessoaRepository.findById(id).get();
 
-        if(pessoaSalva.isEmpty()){
+        if(pessoaSalva==null){
             throw new EmptyResultDataAccessException(1);
         }
-        return pessoaSalva.get();
+        return pessoaSalva;
     }
 
 

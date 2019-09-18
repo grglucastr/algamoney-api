@@ -73,8 +73,8 @@ public class LancamentoController  {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirLancamento(@PathVariable Long codigo){
 
-        Optional<Lancamento> lancamento = lancamentoRepository.findById(codigo);
-        if(lancamento.isEmpty()){
+        Lancamento lancamento = lancamentoRepository.findById(codigo).get();
+        if(lancamento == null){
             throw new EmptyResultDataAccessException(1);
         }
 

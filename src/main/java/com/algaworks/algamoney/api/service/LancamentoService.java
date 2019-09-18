@@ -21,8 +21,8 @@ public class LancamentoService {
 
     public Lancamento salvar(Lancamento lancamento){
 
-        Optional<Pessoa> pessoa = pessoaRepository.findById(lancamento.getPessoa().getId());
-        if(pessoa.isEmpty() || pessoa.get().isInativo()){
+        Pessoa pessoa = pessoaRepository.findById(lancamento.getPessoa().getId()).get();
+        if(pessoa ==null || pessoa.isInativo()){
             throw new PessoaInexistenteOuInativaException();
         }
 
