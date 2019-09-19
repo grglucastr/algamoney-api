@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+// Classe responsavel por buscar os usuarios no banco de dados
+
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 
