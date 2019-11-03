@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,11 +34,13 @@ public class PessoaController {
     private ApplicationEventPublisher publisher;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and #oauth2.hasScope('read')")
     public List<Pessoa> listar(){
         return pessoaRepository.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_PESQUISAR_PESSOA') and #oauth2.hasScope('read')")
     public ResponseEntity<Pessoa> pessoaPorId(@PathVariable Long id){
         return pessoaRepository.findById(id)
                 .map(pessoa -> ResponseEntity.ok(pessoa))
@@ -45,6 +48,7 @@ public class PessoaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_CADASTRAR_PESSOA') and #oauth2.hasScope('write')")
     public ResponseEntity<Pessoa> criarPessoa(@Valid @RequestBody Pessoa novaPessoa, HttpServletResponse response){
         Pessoa pessoa = pessoaRepository.save(novaPessoa);
         publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoa.getId()));
@@ -53,11 +57,13 @@ public class PessoaController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('ROLE_REMOVER_PESSOA') and #oauth2.hasScope('write')")
     public void remover(@PathVariable Long id){
         pessoaRepository.deleteById(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_CADASTRAR_PESSOA') and #oauth2.hasScope('write')")
     public ResponseEntity<Pessoa> atualizar( @PathVariable Long id, @Valid @RequestBody Pessoa pessoa ){
         Pessoa pessoaSalva = pessoaService.atualizar(id, pessoa);
         return ResponseEntity.ok(pessoaSalva);
@@ -65,6 +71,7 @@ public class PessoaController {
 
     @PutMapping("{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('ROLE_CADASTRAR_PESSOA') and #oauth2.hasScope('write')")
     public void atualizarPropriedadeAtivo(@PathVariable Long id, @RequestBody Boolean ativo){
         pessoaService.atualizarPropriedadeAtivo(id, ativo);
 

@@ -2,6 +2,7 @@ package com.algaworks.algamoney.api.repository.lancamento;
 
 import com.algaworks.algamoney.api.model.Lancamento;
 import com.algaworks.algamoney.api.repository.filter.LancamentoFilter;
+import com.algaworks.algamoney.api.repository.projection.ResumoLancamento;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -69,7 +70,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         return predicates.toArray(new Predicate[predicates.size()]);
     }
 
-    private void adicionarRestricoesPaginacao(Pageable pageable, TypedQuery<Lancamento> query) {
+    private void adicionarRestricoesPaginacao(Pageable pageable, TypedQuery<?> query) {
         int paginaAtual = pageable.getPageNumber();
         int totalPorPagina = pageable.getPageSize();
         int primeiroRegistroDaPagina = paginaAtual * totalPorPagina;
@@ -92,5 +93,29 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
         criteria.select(builder.count(root));
 
         return manager.createQuery(criteria).getSingleResult();
+    }
+
+    @Override
+    public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+        CriteriaBuilder builder = manager.getCriteriaBuilder();
+        CriteriaQuery<ResumoLancamento> criteria = builder.createQuery(ResumoLancamento.class);
+        Root<Lancamento> root = criteria.from(Lancamento.class);
+
+        criteria.select(builder.construct(ResumoLancamento.class,
+                root.get("codigo"),
+                root.get("descricao"),
+                root.get("dataVencimento"),
+                root.get("dataPagamento"),
+                root.get("valor"),
+                root.get("tipoLancamento"),
+                root.get("categoria").get("nome"),
+                root.get("pessoa").get("nome")));
+
+        Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+        criteria.where(predicates);
+
+        TypedQuery<ResumoLancamento> query = manager.createQuery(criteria);
+        adicionarRestricoesPaginacao(pageable, query);
+        return new PageImpl<>(query.getResultList(), pageable, total(lancamentoFilter));
     }
 }
